@@ -1,0 +1,83 @@
+import { Fragment, useEffect, useState } from "react";
+import "./styles.css";
+import ReadOnlyRow from './ReadOnlyRow'
+import EditableRow from "./EditableRow";
+
+export default function App() {
+  const [list, setList]=useState([]);
+  const [editId, setEditId]=useState(null);
+  const [editSave, setEditSave]=useState({
+    fullName: "",
+    email: "",
+    role: ""
+  })
+   useEffect(()=>{
+    fetch("https://geektrust.s3-ap-southeast-1.amazonaws.com/adminui-problem/members.json")
+    .then(res=>res.json()).then(data=>setList(data))
+   },[])
+  const handleEditclick=(e, data)=>{
+  e.preventDefault();
+  setEditId(data.id)
+  const values={
+    fullName:data.fullName,
+    email:data.email,
+    role: data.role
+  };
+   setEditSave(values)
+  };
+  const handleSaveChange=(e)=>{
+    e.preventDefault();
+    const fieldName=e.target.getAttribute("name");
+    const fieldValue=e.target.value;
+
+    const newData={...editSave};
+    newData[fieldName]=fieldValue;
+    setEditSave(newData)
+  }
+  const handleSaveSubmit=(e)=>{
+    e.preventDefault();
+     
+    const editedData={
+      id:list.id,
+      fullName:editSave.fullName,
+      email:editSave.email,
+      role:editSave.role
+    };
+    const newData=[...list];
+    const index=list.findIndex((data)=>data.id===list.id);
+    newData[index]=editedData;
+    setList(newData);
+    setEditId(null)
+  }
+  return (
+    <div>
+    <div className="App">
+   <input/>
+    </div>
+    <div>
+    <form onSubmit={handleSaveSubmit}>
+    <table>
+            <thead>
+              <tr>
+              <th>name</th>
+              <th>email</th>
+              <th>role</th>
+              <th>Action</th>
+              </tr>
+              </thead>
+              <tbody>
+      {list.map((data)=>{
+        return (  
+          <Fragment>
+            {editId===data.id?(<EditableRow editSave={editSave} handleSaveChange={handleSaveChange}/>)
+            :(<ReadOnlyRow data={data} handleEditclick={handleEditclick}/>)}
+      </Fragment>
+        )
+      })}
+      </tbody>
+      </table>
+      </form>
+    </div>
+    </div>
+  );
+}

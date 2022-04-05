@@ -1,0 +1,15 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+table-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+table,
+tr,
+th {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
